@@ -33,8 +33,6 @@ public class InvestmentResource {
     @Value("${api.url}")
     private String apiUrl;
 
-  // private static Set<String> quotesList = new HashSet<>();
-
    @RequestMapping("/{stickerId}")
     public QuoteDetails getStickerDetails(@PathVariable String stickerId){
         QuoteDetails quoteDetails =   restTemplate.getForObject(apiUrl+"/"+stickerId+"/quotes?apikey="+apiKey, QuoteDetails.class);
@@ -65,7 +63,7 @@ public class InvestmentResource {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> save(@RequestBody QuoteDetailsResponse quoteDetailsResponse) throws IOException {
         QuoteDetails quoteDetails =   restTemplate.getForObject(apiUrl+"/"+quoteDetailsResponse.getSymbol()+"/quotes?apikey="+apiKey, QuoteDetails.class);
-        if(quoteDetails!= null && !quoteDetails.getSymbol().isEmpty()){
+        if(quoteDetails!= null && !quoteDetails.getAdditionalProperties().isEmpty()){
             stocksFileService.addStockToFile(quoteDetailsResponse.getSymbol());
             return new ResponseEntity<>("Saved Successfully", HttpStatus.CREATED);
         }else{

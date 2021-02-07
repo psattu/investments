@@ -1,7 +1,7 @@
 package com.tandra.investment.service;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,14 +9,17 @@ import java.util.Set;
 @Service
 public class StocksFileService {
 
-
+    private static final String stockFileDbName ="stocklist.txt";
+    private static final String stockFileDbTempName ="stocklist_temp.txt";
     public Set<String> readStockListFromFile() {
         Set<String > stockList = new HashSet<>();
         String line;
         try {
-            BufferedReader input =  new BufferedReader(new FileReader("stocklist.txt"));
+            ClassPathResource res = new ClassPathResource(stockFileDbName);
+            File file = new File(res.getPath());
+             BufferedReader input =  new BufferedReader(new FileReader(file.getName()));
             if(!input.ready()){
-                throw new IOException();
+                return stockList;
             }
             while((line = input.readLine()) != null ){
                 stockList.add(line);
@@ -31,8 +34,10 @@ public class StocksFileService {
         return stockList;
     }
     public void addStockToFile(String stockSticker) throws IOException {
-        BufferedWriter bw = null;
-            bw = new BufferedWriter( new FileWriter("stocklist.txt",true) );
+             BufferedWriter bw ;
+             ClassPathResource res = new ClassPathResource(stockFileDbName);
+            File file = new File(res.getPath());
+            bw = new BufferedWriter( new FileWriter(file.getName(),true) );
             bw.write(stockSticker);
             bw.flush();
             bw.newLine();
@@ -41,8 +46,10 @@ public class StocksFileService {
     }
     public void deleteStockByStickerID(String stickerId) throws IOException {
         String  record;
-        File tempDB = new File("stocklist.txt_temp.txt");
-        File db = new File("stocklist.txt");
+        ClassPathResource res = new ClassPathResource(stockFileDbName);
+        File db = new File(res.getPath());
+        ClassPathResource resTempDb = new ClassPathResource(stockFileDbTempName);
+        File tempDB = new File(resTempDb.getPath());
         BufferedReader br = new BufferedReader( new FileReader( db ) );
         BufferedWriter bw = new BufferedWriter( new FileWriter( tempDB ) );
         while( ( record = br.readLine() ) != null ) {
